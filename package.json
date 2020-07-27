@@ -1,0 +1,44 @@
+{
+  "name": "base",
+  "version": "1.0.0",
+  "description": "Tests",
+  "main": "index.js",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/Mackaton/taMACgotchi_backend"
+  },
+  "scripts": {
+    "dev": "DEBUG=app:* nodemon src/index",
+    "start": "NODE_ENV=production node src/index",
+    "test": "mocha tests/ --exit",
+    "pretest": "npx eslint --ignore-path .gitignore . --fix"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "./node_modules/.bin/eslint — fix",
+      "git add"
+    ]
+  },
+  "keywords": [
+    "testing",
+    "base"
+  ],
+  "author": "jesus kauze",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.5.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "nodemon": "^2.0.4"
+  }
+}
