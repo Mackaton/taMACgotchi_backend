@@ -20,7 +20,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "./node_modules/.bin/eslint — fix",
+      "eslint --cache --fix",
       "git add"
     ]
   },
