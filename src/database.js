@@ -1,12 +1,13 @@
-// const mongoose = require('mongoose')
-// console.log(process.env.HOST_MONGODB)
+// DATABASE CONNECTION
 
-// const {HOST_MONGODB, DATABASE_MONGODB} = process.env;
-// const MONGODB_URI = `mongodb://${HOST_MONGODB}/${DATABASE_MONGODB}`;
+const mongoose = require('mongoose')
+const { config } = require('./config/config.js');
 
-// mongoose.connect(MONGODB_URI, {
-//     useUnifiedTopology: true,
-//     useNewUrlParser: true
-// })
-//     .then(db => console.log('Database is connected at port 27017'))
-//     .catch(err => console.log(err));
+const MONGODB_URI = `mongodb+srv://${config.mongo_user}:${config.mongo_password}@${config.mongo_host}/${config.mongo_db}?retryWrites=true&w=majority`;
+
+mongoose.connect(MONGODB_URI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+})
+    .then(() => console.log('Database is connected'))
+    .catch(err => console.log(err));
