@@ -6,10 +6,10 @@ var Schema = mongoose.Schema;
 var TestInitialSchema = Schema({
     results:
     [{
-        id_question: String,
+        id_question: {type: mongoose.Schema.Types.ObjectId, ref: 'Question'},
         value: Number
     }],
-    id_user: {type: String, required: true},
+    id_user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     date: Date
 });
 

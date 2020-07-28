@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var TaskSchema = Schema({
     name: {type: String, required: true},
     challenge: {type: Boolean, required: true},
-    tier: {type: Number, default: 100},
+    tier: {type: Number, required: true},
     value: {type: Number, required: true},
 });
 

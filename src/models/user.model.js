@@ -12,15 +12,15 @@ var UserSchema = Schema({
         value: Number,
         date: Date
     }],
-    friends: [String], 
-    medals: [String],
+    friends: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}], 
+    medals: [{type: mongoose.Schema.Types.ObjectId, ref: 'Medals'}],
     task_challenges:
     [{
-        id_task: String,
+        id_task: {type: mongoose.Schema.Types.ObjectId, ref: 'Task'},
         prom: Number,
         date: Date
     }],
-    forest: [String],
+    forest: [{type: mongoose.Schema.Types.ObjectId, ref: 'Plant'}],
     picture: String,
     role: String
 });

@@ -4,8 +4,8 @@ var mongoose =  require('mongoose');
 var Schema = mongoose.Schema;
 // Creamos el objeto del esquema y sus atributos
 var PlantSchema = Schema({
-    type: {type: String, required: true},
-    user_id: {type: String, required: true},
+    type: {type: mongoose.Schema.Types.ObjectId, ref: 'PlantType', required: true},
+    id_user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     health: {type: Number, default: 100},
     name: {type: String, required: true},
     forest: {type: Boolean, default: false},
