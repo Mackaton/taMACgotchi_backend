@@ -10,4 +10,4 @@ mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true
 })
     .then(() => console.log('Database is connected'))
-    .catch(err => console.log(err));
+    .catch(err => console.log(err, 'Revisar credenciales'));

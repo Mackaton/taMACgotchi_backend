@@ -5,7 +5,7 @@ class MainController {
     // GET example
     async example(req, res) {
         try {
-            res.status(200).json('Todo Ok')
+            res.status(200).json('Todo Ok en IBM')
         } catch (error) {
             console.log(error);
         }
