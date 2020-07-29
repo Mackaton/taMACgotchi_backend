@@ -16,7 +16,7 @@ class MainController {
     async getQuetions(req,res) {
         try {
             const preguntas = await Questions.find({});
-            res.send(preguntas)
+            res.send(preguntas.riws)
         } catch (error) {
             console.log(error)
         }

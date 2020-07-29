@@ -15,6 +15,7 @@ app.use(cors())
 
 // Routes
 app.use(require('./routes/example.routes'))
+app.use(require('./routes/user.routes'))
 
 
 module.exports = app

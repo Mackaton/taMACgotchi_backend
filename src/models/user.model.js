@@ -4,6 +4,7 @@ var mongoose =  require('mongoose');
 var Schema = mongoose.Schema;
 // Creamos el objeto del esquema y sus atributos
 var UserSchema = Schema({
+    username: {type: String, require: true, unique: true},
     email: {type: String, required: true},
     provider: {type: String, required: true},
     name: {type: String, required: true},
@@ -12,7 +13,7 @@ var UserSchema = Schema({
         value: Number,
         date: Date
     }],
-    friends: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}], 
+    friends: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     medals: [{type: mongoose.Schema.Types.ObjectId, ref: 'Medals'}],
     task_challenges:
     [{
