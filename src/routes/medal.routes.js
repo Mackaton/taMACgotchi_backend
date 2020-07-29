@@ -8,7 +8,14 @@ const medalController = new MedalController
 //                              Routes Medals
 //-----------------------------------------------------------------------//
 
-// GET Example
-// router.get('/ruta', medalController.funcion);
+// GET
+router.get('/medals', medalController.getMedals);
+router.get('/medals/:id', medalController.getMedalsById);
+
+// UPDATE
+router.put('/update/medals/:id', medalController.updateMedal)
+
+// POST
+router.post('/create/medals', medalController.postMedal)
 
 module.exports = router;

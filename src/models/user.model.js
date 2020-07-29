@@ -8,6 +8,9 @@ var UserSchema = Schema({
     email: {type: String, required: true},
     provider: {type: String, required: true},
     name: {type: String, required: true},
+    lastname: {type: String, required: true},
+    birthday: Date,
+    gender: String,
     carbon:
     [{
         value: Number,
@@ -22,8 +25,7 @@ var UserSchema = Schema({
         date: Date
     }],
     forest: [{type: mongoose.Schema.Types.ObjectId, ref: 'Plant'}],
-    picture: String,
-    role: String
+    picture: String
 });
 
 UserSchema.index({ email: 1, provider: 1 }, { unique: true });
