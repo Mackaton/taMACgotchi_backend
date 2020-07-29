@@ -1,7 +1,7 @@
 const User = require('../models/user.model');
+const { query } = require('express');
 
 class UserController {
-
 	/* ================================ GETS ================================ */
 
 	// all users
@@ -16,9 +16,10 @@ class UserController {
 
 	// specific user
 	async getUser(req, res) {
-		const { username } = req.body;
+		const { username } = req.params;
+		console.log(username);
 		try {
-			const user = await User.findById(username);
+			const user = await User.find({ username: username });
 			console.log(user);
 			res.send(user);
 		} catch (error) {
@@ -37,6 +38,25 @@ class UserController {
 				if (err) return res.status(400).json({ error: `Error en los datos del usuario` });
 				res.status(200).json({ message: `Usuario ${username} creado exitosamente` });
 			});
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	/* ================================ POSTS =============================== */
+
+	// update user info
+	async updateUser(req, res) {
+		const { username } = req.params;
+		const { name, carbon, medals, task } = req.body;
+		const query = { username: username };
+		try {
+			const user = await User.findOneAndUpdate(query, { name }, function (err) {
+				if (err) return res.status(400).json({ error: `Error en los datos del usuario` });
+				res.status(200).json({ message: `Usuario ${username} actualizado exitosamente` });
+			});
+			console.log(user);
+			res.send('ok');
 		} catch (error) {
 			console.error(error);
 		}
