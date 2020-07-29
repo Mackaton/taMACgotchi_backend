@@ -4,7 +4,7 @@ var mongoose =  require('mongoose');
 var Schema = mongoose.Schema;
 // Creamos el objeto del esquema y sus atributos
 var QuestionSchema = Schema({
-    description: {type: String, required: true},
+    description: {type: String, required: true, unique: true},
     options: [{option: String, value: Number}]
 });
 

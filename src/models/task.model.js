@@ -4,7 +4,7 @@ var mongoose =  require('mongoose');
 var Schema = mongoose.Schema;
 // Creamos el objeto del esquema y sus atributos
 var TaskSchema = Schema({
-    name: {type: String, required: true},
+    name: {type: String, required: true, unique: true},
     challenge: {type: Boolean, required: true},
     tier: {type: Number, required: true},
     value: {type: Number, required: true},
