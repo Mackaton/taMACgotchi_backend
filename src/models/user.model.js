@@ -9,8 +9,6 @@ var UserSchema = Schema({
     provider: {type: String, required: true},
     name: {type: String, required: true},
     lastname: {type: String, required: true},
-    birthday: Date,
-    gender: String,
     carbon:
     [{
         value: Number,

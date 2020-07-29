@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-const { query } = require('express');
+require('express');
 
 class UserController {
 	/* ================================ GETS ================================ */
@@ -31,8 +31,8 @@ class UserController {
 
 	// create new user
 	async createUser(req, res) {
-		const { username, email, provider, name } = req.body;
-		const user = new User({ username, email, provider, name });
+		const { username, email, provider, name, lastname, picture } = req.body;
+		const user = new User({ username, email, provider, name, lastname, picture });
 		try {
 			await user.save(function (err) {
 				if (err) return res.status(400).json({ error: `Error en los datos del usuario` });
@@ -48,7 +48,7 @@ class UserController {
 	// update user info
 	async updateUser(req, res) {
 		const { username } = req.params;
-		const { name, carbon, medals, task } = req.body;
+		const { name } = req.body;
 		const query = { username: username };
 		try {
 			const user = await User.findOneAndUpdate(query, { name }, function (err) {
