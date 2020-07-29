@@ -1,4 +1,4 @@
-/* Main Controller Class */
+// Schema/Model
 const Questions = require('../models/question.model')
 
 

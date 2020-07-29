@@ -116,3 +116,4 @@ node_modules_linux/
 
 # Database Fill
 filldb/
+src/controllers
