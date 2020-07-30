@@ -9,8 +9,8 @@ class MedalsController {
 	async getMedalsById(req, res) {
 		try {
             const id_medals_req = req.params.id;
-			const medals = await Medals.findById({ id_medals_req });
-			res.send(medals);
+			const medals = await Medals.findById(id_medals_req).populate('challenge');
+			res.send(medals)
 		} catch (error) {
 			console.log(error);
 		}
@@ -19,7 +19,7 @@ class MedalsController {
 	// Get all medals
 	async getMedals(req, res) {
 		try {
-			const medals = await Medals.find();
+			const medals = await Medals.find().populate('challenge');
 			res.send(medals);
 		} catch (error) {
 			console.log(error);
@@ -32,7 +32,7 @@ class MedalsController {
 		try {
 			const id_medals_req = req.params.id;
 			const medal_req = req.body;
-			const medals = await Medals.findByIdAndUpdate({ id_medals_req, medal_req });
+			const medals = await Medals.findByIdAndUpdate(id_medals_req, medal_req);
 			res.send(medals);
 		} catch (error) {
 			console.log(error);
@@ -43,8 +43,8 @@ class MedalsController {
 
 	async postMedal(req, res) {
 		try {
-			const { name, id_task_req } = req.body;
-			const task = Task.findById(id_task_req);
+			const { name, id_challenge } = req.body;
+			const task = await Task.findById(id_challenge);
 			const medal = new Medals({ name: name, challenge: task });
 			await medal.save(function (err) {
                 if (err) return res.status(400).json({ error: 'Ha ocurrido un error' });

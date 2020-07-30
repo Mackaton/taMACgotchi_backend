@@ -8,7 +8,7 @@ class TaskController {
 	async getTaskById(req, res) {
 		try {
             const id_task_req = req.params.id;
-            const task = await Task.find({ _id: id_task_req, challenge: false });
+			const task = await Task.find({ _id: id_task_req, challenge: false });
 			res.send(task);
 		} catch (error) {
 			console.log(error);
