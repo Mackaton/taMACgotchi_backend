@@ -18,4 +18,7 @@ router.put('/update/medals/:id', medalController.updateMedal)
 // POST
 router.post('/create/medals', medalController.postMedal)
 
+// DELETE
+router.delete('/delete/medals/:id', medalController.deleteMedal);
+
 module.exports = router;

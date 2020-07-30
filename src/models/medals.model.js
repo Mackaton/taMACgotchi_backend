@@ -1,4 +1,5 @@
 var mongoose =  require('mongoose');
+mongoose.set('useFindAndModify', false);
 // Usaremos los esquemas
 var Schema = mongoose.Schema;
 // Creamos el objeto del esquema y sus atributos

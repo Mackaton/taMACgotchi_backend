@@ -12,10 +12,17 @@ const taskController = new TaskController();
 router.get('/tasks', taskController.getTasks);
 router.get('/tasks/:id', taskController.getTaskById);
 
+router.get('/challenges', taskController.getChallenges);
+router.get('/challenges/:id', taskController.getChallengeById);
+
 // UPDATE
-router.put('/update/tasks/:id', taskController.updateTask);
+router.put('/update/tasksandchallenges/:id', taskController.updateTaskOrChallenge);
 
 // POST
 router.post('/create/tasks', taskController.postTask);
+router.post('/create/challenges', taskController.postChallenge);
+
+// DELETE
+router.delete('/delete/tasksandchallenges/:id', taskController.deleteTC);
 
 module.exports = router;

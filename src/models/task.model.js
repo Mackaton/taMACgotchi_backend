@@ -1,10 +1,11 @@
 // Cargamos el módulo de mongoose
 var mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
 // Usaremos los esquemas
 var Schema = mongoose.Schema;
 // Creamos el objeto del esquema y sus atributos
 var TaskSchema = Schema({
-	name: { type: String, required: true, unique: true },
+	name: { type: String, required: true, unique: true, min: 3 },
 	challenge: { type: Boolean, required: true },
 	tier: { type: Number, required: true },
 	value: { type: Number, required: true },

@@ -1,14 +1,16 @@
 // Cargamos el módulo de mongoose
 var mongoose =  require('mongoose');
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 // Usaremos los esquemas
 var Schema = mongoose.Schema;
 // Creamos el objeto del esquema y sus atributos
 var UserSchema = Schema({
-    username: {type: String, require: true, unique: true},
-    email: {type: String, required: true},
-    provider: {type: String, required: true},
-    name: {type: String, required: true},
-    lastname: {type: String, required: true},
+    username: {type: String, require: true, unique: true, min: 3, max: 12},
+    email: {type: String, required: true, min: 3, max: 50},
+    provider: {type: String, required: true, min: 3, max: 20},
+    name: {type: String, required: true, min: 1, max: 20},
+    lastname: {type: String, required: true, min: 1, max: 20},
     carbon:
     [{
         value: Number,
@@ -18,7 +20,7 @@ var UserSchema = Schema({
     medals: [{type: mongoose.Schema.Types.ObjectId, ref: 'Medals'}],
     task_challenges:
     [{
-        id_task: {type: mongoose.Schema.Types.ObjectId, ref: 'Task'},
+        task: {type: mongoose.Schema.Types.ObjectId, ref: 'Task'},
         prom: Number,
         date: Date
     }],
