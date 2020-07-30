@@ -16,6 +16,8 @@ app.use(cors());
 // Routes
 app.use(require('./routes/user.routes'));
 app.use(require('./routes/task.routes'));
+app.use(require('./routes/plant_type.routes'));
+app.use(require('./routes/plant.routes'));
 app.use(require('./routes/medal.routes'));
 app.use(require('./routes/test_initial.routes'));
 app.use(require('./routes/question.routes'));
