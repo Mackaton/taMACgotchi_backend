@@ -12,7 +12,8 @@ var TestInitialSchema = Schema({
         value: Number
     }],
     user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
-    date: Date
+    date: Date,
+    prom_carbon: {type: Number}
 });
 
 // Exportamos el modelo para usarlo en otros ficheros

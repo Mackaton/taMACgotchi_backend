@@ -10,7 +10,7 @@ class TestInitialController {
 		try {
             const username = req.params.username;
 			const user = await User.findOne({username: username});
-            var test = await TestInitial.findOne({user: user._id}).populate('results.0.id_question', 'description');
+            var test = await TestInitial.findOne({user: user._id}).populate([{path:'user',select:'username'}, {path:'results.0.id_question',select:'description'}]).exec();
 			res.send(test)
 		} catch (error) {
 			console.log(error);
@@ -20,7 +20,7 @@ class TestInitialController {
 	// Get all tests
 	async getTests(req, res) {
 		try {
-			const tests = await TestInitial.find().populate('results.0.id_question', 'description');
+			const tests = await TestInitial.find().populate([{path:'user',select:'username'}, {path:'results.id_question',select:'description'}]).exec();
 			res.send(tests);
 		} catch (error) {
 			console.log(error);
@@ -46,14 +46,28 @@ class TestInitialController {
 
 	async postTest(req, res) {
 		try {
-			const { username, date, results } = req.body;
-            const [user] = await User.find({username: username});
-            const test = new TestInitial({ user: user, date: date , results: results });
+			const { username, results } = req.body;
+			const [user] = await User.find({username: username});
+
+			// Validacion
+			const validation = await TestInitial.find({user: user});
+			if (validation.length > 0) return res.status(400).json({ error: `El usuario ${username} ya completo el test inicial` });
+			
+			// Carbon Prom
+			var promCarbon = 0;
+			results.forEach(result => {
+				promCarbon += result.value;
+			});
+			
+			// User update
+			//user.carbon.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0)); 
+			await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: promCarbon + 7, date: new Date()}}})
+
+            const test = new TestInitial({ user: user._id, date: new Date(), results: results, prom_carbon: promCarbon});
 			await test.save(function (err) {
                 if (err) return res.status(400).json({ error: 'Ha ocurrido un error' });
                 res.status(200).json({ message: `Test Inicial del usuario ${username} ha sido creada correctamente` });
 			});
-			
 		} catch (error) {
 			console.log(error);
 		}

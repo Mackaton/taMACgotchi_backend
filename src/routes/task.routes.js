@@ -25,4 +25,6 @@ router.post('/create/challenges', taskController.postChallenge);
 // DELETE
 router.delete('/delete/tasksandchallenges/:id', taskController.deleteTC);
 
+//router.post('/insert/challenges', taskController.insertChallenges)
+
 module.exports = router;

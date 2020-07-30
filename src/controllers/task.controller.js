@@ -1,4 +1,5 @@
 const Task = require('../models/task.model');
+//const challenges = require('../filldb/insert_challenges');
 
 class TaskController {
 
@@ -45,6 +46,18 @@ class TaskController {
 			console.log(error);
 		}
 	}
+
+	/*async insertChallenges(req, res){
+		try{
+			await challenges.forEach(challenge => {
+				challenge['challenge'] = true;
+				var new_challenge = new Task(challenge);
+				new_challenge.save(function (err){if (err) return console.error(err)})
+			});
+		}catch(error){
+			console.log(error);
+		}
+	}*/
 
 	/* ================================ PUTS ================================ */
 
