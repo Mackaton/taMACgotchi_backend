@@ -12,7 +12,7 @@ const userController = new UserController
 router.get('/users', userController.getUsers);
 
 // GET specific user
-router.get('/users/:username', userController.getUser);
+router.get('/users/:email', userController.getUser);
 
 // POST create user
 router.post('/create/users', userController.createUser);

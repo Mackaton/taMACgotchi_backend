@@ -15,11 +15,9 @@ class UserController {
 
 	// specific user
 	async getUser(req, res) {
-		const { username } = req.params;
-		console.log(username);
+		const { email } = req.params;
 		try {
-			const user = await User.find({ username: username });
-			console.log(user);
+			const user = await User.find({ email: email });
 			res.send(user);
 		} catch (error) {
 			console.log(error);
