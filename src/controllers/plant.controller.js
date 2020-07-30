@@ -37,7 +37,7 @@ class TypePlantController {
 				// Bad
 				state = 'B';
 			}
-			return res.status(200).json({ actualPlant, url: `${picture}${type}t${lvl}${state}.png` });
+			return res.status(200).json({ actualPlant, url: `${picture}${type}${lvl}${state}.png` });
 		} catch (error) {
 			console.error(error);
 		}
@@ -53,7 +53,7 @@ class TypePlantController {
 				forestResume.push({
 					plantName: plant.name,
 					plantType: plant.type.name,
-					url: `${picture}${plant.type.name}t3G.png`,
+					url: `${picture}${plant.type.name}3G.png`,
 				});
 			});
 			res.status(200).send(forestResume);
@@ -151,8 +151,16 @@ class TypePlantController {
 	async checkCarbonPlants() {
         // Obtengo todas las plantas que estan en uso actualmente
         const activesPlants = await Plant.find({forest: false})
-        activesPlants.forEach( plant => {
+        activesPlants.forEach( async plant => {
             let idUserOwner = plant.user
+            let user = User.findById({_id: idUserOwner})
+            let userCarbon = user.carbon[0]
+            if (userCarbon < plant.init_carbon) {
+                await Plant.findByIdAndUpdate({_id: plant._id}, { $inc: {experience: 1}})
+            } else {
+                await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {strike: 'x'}})
+            }
+
         });
 
     }
