@@ -17,5 +17,7 @@ app.use(cors());
 app.use(require('./routes/example.routes'));
 app.use(require('./routes/user.routes'));
 app.use(require('./routes/task.routes'));
+app.use(require('./routes/plant_type.routes'));
+app.use(require('./routes/plant.routes'));
 
 module.exports = app;

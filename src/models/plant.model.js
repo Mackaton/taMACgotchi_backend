@@ -7,10 +7,10 @@ var Schema = mongoose.Schema;
 var PlantSchema = Schema({
     type: {type: mongoose.Schema.Types.ObjectId, ref: 'PlantType', required: true},
     user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
-    health: {type: Number, default: 100},
+    health: {type: Boolean, required: true, default: true},
     name: {type: String, required: true, min: 1},
     forest: {type: Boolean, default: false},
-    level: {type: Number, default: 0},
+    level: {type: Number, default: 1},
     experience: {type: Number, default: 0}
 });
 

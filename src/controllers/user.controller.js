@@ -1,5 +1,4 @@
 const User = require('../models/user.model');
-require('express');
 
 class UserController {
 	/* ================================ GETS ================================ */
@@ -31,8 +30,8 @@ class UserController {
 
 	// create new user
 	async createUser(req, res) {
-		const { username, email, provider, name, lastname, picture } = req.body;
-		const user = new User({ username, email, provider, name, lastname, picture });
+		const { username, email, provider, name } = req.body;
+		const user = new User({ username, email, provider, name });
 		try {
 			await user.save(function (err) {
 				if (err) return res.status(400).json({ error: `Error en los datos del usuario` });
@@ -48,10 +47,10 @@ class UserController {
 	// update user info
 	async updateUser(req, res) {
 		const { username } = req.params;
-		const { name } = req.body;
+		const { name, forest, medals, task } = req.body;
 		const query = { username: username };
 		try {
-			const user = await User.findOneAndUpdate(query, { name }, function (err) {
+			const user = await User.findOneAndUpdate(query, { forest }, function (err) {
 				if (err) return res.status(400).json({ error: `Error en los datos del usuario` });
 				res.status(200).json({ message: `Usuario ${username} actualizado exitosamente` });
 			});
