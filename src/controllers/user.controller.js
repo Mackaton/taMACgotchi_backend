@@ -44,7 +44,7 @@ class UserController {
 				const userPlant = {
 					user,
 					actualPlant,
-					urlPicture: `${picture}${type}t${lvl}${state}.png`,
+					urlPicture: `${picture}${type}${lvl}${state}.png`,
 				};
 				return res.status(200).send(userPlant)
 			}
