@@ -17,5 +17,8 @@ app.use(cors());
 app.use(require('./routes/example.routes'));
 app.use(require('./routes/user.routes'));
 app.use(require('./routes/task.routes'));
+app.use(require('./routes/medal.routes'));
+app.use(require('./routes/test_initial.routes'));
+app.use(require('./routes/question.routes'));
 
 module.exports = app;
