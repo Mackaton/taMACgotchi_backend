@@ -58,8 +58,8 @@ class UserController {
 
 	// create new user
 	async createUser(req, res) {
-		const { username, email, provider, name } = req.body;
-		const user = new User({ username, email, provider, name });
+		const { username, email, provider, name, lastname } = req.body;
+		const user = new User({ username, email, provider, name, lastname });
 		try {
 			await user.save(function (err) {
 				if (err) return res.status(400).json({ error: `Error en los datos del usuario` });
