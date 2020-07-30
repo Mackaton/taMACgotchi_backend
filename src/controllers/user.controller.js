@@ -1,4 +1,7 @@
 const User = require('../models/user.model');
+const Plant = require('../models/plant.model');
+
+const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud/';
 
 class UserController {
 	/* ================================ GETS ================================ */
@@ -16,9 +19,36 @@ class UserController {
 	// specific user
 	async getUser(req, res) {
 		const { email } = req.params;
+		let type, state, lvl;
 		try {
-			const user = await User.find({ email: email });
-			res.send(user);
+			// Obtain user info and check if he has a plant
+			const user = await User.findOne({ email: email });
+			if (!user) {
+				return res.status(400).json({message: `No existe un usuario registrado con el email ${email}`})
+			}
+			const actualPlant = await Plant.findOne({ user: user._id, forest: false }).populate('type', 'name');
+
+			if (!actualPlant) {
+				return res.status(200).send(user)
+			} else {
+				// Picture URL
+				type = actualPlant.type.name;
+				lvl = actualPlant.level;
+				if (actualPlant.health == true) {
+					// Good
+					state = 'G';
+				} else {
+					// Bad
+					state = 'B';
+				}
+				const userPlant = {
+					user,
+					actualPlant,
+					urlPicture: `${picture}${type}t${lvl}${state}.png`,
+				};
+				return res.status(200).send(userPlant)
+			}
+
 		} catch (error) {
 			console.log(error);
 		}
