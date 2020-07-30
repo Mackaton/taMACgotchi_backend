@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const Plant = require('../models/plant.model');
+const TestInitial = require('../models/test_initial.model');
 
 const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud/';
 
@@ -19,17 +20,44 @@ class UserController {
 	// specific user
 	async getUser(req, res) {
 		const { email } = req.params;
-		let type, state, lvl;
+		let type, state, lvl, test;
 		try {
 			// Obtain user info and check if he has a plant
-			const user = await User.findOne({ email: email });
-			if (!user) {
-				return res.status(400).json({message: `No existe un usuario registrado con el email ${email}`})
+			const userData = await User.findOne({ email: email });
+			if (!userData) {
+				return res.status(400).json({ message: `No existe un usuario registrado con el email ${email}` });
 			}
-			const actualPlant = await Plant.findOne({ user: user._id, forest: false }).populate('type', 'name');
+
+			// Check if the user made the initial test
+			const initTestUser = await TestInitial.findOne({ user: userData._id });
+			if (initTestUser) {
+				test = true
+			} else {
+				test = false
+			}
+
+			// Response User values (please we need to change the user schema model to add init test boolean )
+			const user = {
+				_id: userData._id,
+				username: userData.username,
+				email: userData.email,
+				provider: userData.provider,
+				name: userData.name,
+				lastname: userData.lastname,
+				tested: test,
+				picture: userData.picture,
+				carbon: userData.carbon,
+				task_challenges: userData.task_challenges,
+				friends: userData.friends,
+				medals: userData.medals,
+				forest: userData.forest
+			};
+
+			// Get actual active plant from the user
+			const actualPlant = await Plant.findOne({ user: userData._id, forest: false }).populate('type', 'name');
 
 			if (!actualPlant) {
-				return res.status(200).send(user)
+				return res.status(200).json(user);
 			} else {
 				// Picture URL
 				type = actualPlant.type.name;
@@ -45,10 +73,10 @@ class UserController {
 					user,
 					actualPlant,
 					urlPicture: `${picture}${type}${lvl}${state}.png`,
+					InitTest: test,
 				};
-				return res.status(200).send(userPlant)
+				return res.status(200).send(userPlant);
 			}
-
 		} catch (error) {
 			console.log(error);
 		}
