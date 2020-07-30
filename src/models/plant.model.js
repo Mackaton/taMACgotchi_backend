@@ -11,7 +11,9 @@ var PlantSchema = Schema({
     name: {type: String, required: true, min: 1},
     forest: {type: Boolean, default: false},
     level: {type: Number, default: 1},
-    experience: {type: Number, default: 0}
+    experience: {type: Number, default: 0},
+    strike: {type: [String], default: []},
+    xstrike: {type: [String], default: []}
 });
 
 // Exportamos el modelo para usarlo en otros ficheros

@@ -36,11 +36,15 @@ class TypePlantController {
 			} else {
 				// Bad
 				state = 'B';
-			}
-
-			res.status(200).json({ actualPlant, url: `${picture}${type}t${lvl}${state}.png` });
+            }
+            
+            const userPlant = {
+                actualPlant,
+                urlPicture: `${picture}${type}t${lvl}${state}.png`
+            }
+			return res.status(200).json({ actualPlant, url: `${picture}${type}t${lvl}${state}.png` });
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 
@@ -59,7 +63,7 @@ class TypePlantController {
 			});
 			res.status(200).send(forestResume);
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 
@@ -67,7 +71,7 @@ class TypePlantController {
 	//                              POSTS CONTROLLERS
 	//-----------------------------------------------------------------------//
 
-	// create test plant (para colocar plantas de forma manual, solo para pruebas)
+	// [DEVELOPERS] create test plant (para colocar plantas de forma manual, solo para pruebas)
 	async createPlantTest(req, res) {
 		const { name } = req.body;
 		const newPlant = new Plant(req.body);
@@ -77,7 +81,7 @@ class TypePlantController {
 				res.status(200).json({ message: `Planta TEST ${name} creada` });
 			});
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 		}
 	}
 
@@ -90,23 +94,25 @@ class TypePlantController {
 		const userForest = await User.findById(idUser).populate('forest');
 		userForest.forest.forEach(element => {
 			forestPlant.push(element.type);
-		});
-		console.log('numero de plantas que posee: ', userForest.forest.length);
+        });
+
+        const alreadyHavePlant = await Plant.findOne({user: idUser, forest: false})
+        if (alreadyHavePlant) {
+            return res.status('200').json({message: `Ya posees una planta activa en estos momentos, cuidala y has que crezca`})
+        }
 
 		// Get random type not owned by the user
 		const plantsNotOwned = await TypePlant.find({ _id: { $nin: forestPlant } });
 		const posibility = getRandom(0, plantsNotOwned.length);
 		const resultTypePlant = plantsNotOwned[posibility]._id;
-		console.log('plantas que no posee: ', plantsNotOwned.length);
 
 		// Verify if the user owned all plants
 		if (plantsNotOwned.length == 0) {
 			res.status(200).json({ message: `Felicidades, has obtenido todas las plantas!` });
 		}
 
-		// Create new plant
+		// Create the plant
 		const newPlant = new Plant({ name, type: resultTypePlant, user: idUser });
-		console.log(newPlant.type);
 
 		try {
 			await newPlant.save(function (err) {
@@ -122,7 +128,8 @@ class TypePlantController {
 	//                              PUTS CONTROLLERS
 	//-----------------------------------------------------------------------//
 
-	async updatePlant(req, res) {
+    // Move plant lvl 3 with Good health to the forest
+	async movePlantToForest(req, res) {
 		const { plantId } = req.params;
 		const { forest } = req.body;
 
@@ -130,10 +137,10 @@ class TypePlantController {
 		const userId = plant.user;
 
 		if (forest) {
-			if (plant.level < 3) {
+			if (plant.level < 3 || !plant.health) {
 				return res
 					.status(200)
-					.json({ message: `${plant.name} debe tener al menos nivel 3 para plantarla, su nivel actual es ${plant.level}` });
+					.json({ message: `${plant.name} debe tener al menos nivel 3 para plantarla y estar sana, su nivel actual es ${plant.level}` });
 			}
 			await Plant.findByIdAndUpdate({ _id: plantId }, { forest: true });
 			await User.findByIdAndUpdate({ _id: userId }, { $push: { forest: plant } });
@@ -141,7 +148,10 @@ class TypePlantController {
 		} else {
 			return res.status(200).json({ message: `Aun te falta mejorar el ambiente para plantar a ${plant.name}` });
 		}
-	}
+    }
+
+    // Check level plant
+
 }
 
 module.exports = TypePlantController;

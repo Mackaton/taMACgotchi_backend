@@ -25,7 +25,7 @@ router
 
 router
     // PUT update actual plant to forest
-    .put('/update/plant/:plantId', plantController.updatePlant)
+    .put('/update/plant/:plantId', plantController.movePlantToForest)
 
 
 
