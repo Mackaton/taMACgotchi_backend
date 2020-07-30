@@ -15,10 +15,17 @@ router
     // GET All plants in forest owned by user
     .get('/forest/plant/:userId', plantController.userForestPlants);
 
-// GET TEST
-router.post('/start/new/plant', plantController.createPlant);
 
-router.post('/plant/test/new', plantController.createPlantTest);
+router
+    // POST start new plant
+    .post('/start/new/plant', plantController.createPlant)
+
+    // [DEVELOPER] POST create new plant to start
+    .post('/plant/test/new', plantController.createPlantTest);
+
+router
+    // PUT update actual plant to forest
+    .put('/update/plant/:plantId', plantController.updatePlant)
 
 
 
