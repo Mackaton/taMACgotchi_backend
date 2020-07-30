@@ -151,18 +151,34 @@ class TypePlantController {
 	async checkCarbonPlants() {
         // Obtengo todas las plantas que estan en uso actualmente
         const activesPlants = await Plant.find({forest: false})
+        // Updated every active plant
         activesPlants.forEach( async plant => {
             let idUserOwner = plant.user
             let user = User.findById({_id: idUserOwner})
             let userCarbon = user.carbon[0]
-            if (userCarbon < plant.init_carbon) {
-                await Plant.findByIdAndUpdate({_id: plant._id}, { $inc: {experience: 1}})
+
+            // Check if the user carbon is better than plant carbon
+            if (userCarbon < plant.init_carbon || userCarbon < 2.0) {
+                // Increase experience plant
+                if (!plant.health) {
+                    await Plant.findByIdAndUpdate({_id: plant._id}, {health: true})
+                } else {
+                    const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $inc: {experience: 1}})
+                    if (plantUpdated.experience > 6 && plantUpdated.experience < 14) {
+                        await Plant.findByIdAndUpdate({_id: plant._id}, {level: 2})
+                    } else if (plantUpdated.experience > 13)  {
+                        await Plant.findByIdAndUpdate({_id: plant._id}, {level: 3})
+                    } else if (plantUpdated.experience > 20) {
+                        // no more request to db
+                    }
+                }
             } else {
-                await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {strike: 'x'}})
+                const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {strike: 'x'}})
+                if (plantUpdated.strike.length == 3) {
+                    await Plant.findByIdAndUpdate({_id: plant._id}, {health: false})
+                }
             }
-
         });
-
     }
 }
 
