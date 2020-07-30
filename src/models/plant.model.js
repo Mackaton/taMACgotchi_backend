@@ -12,6 +12,7 @@ var PlantSchema = Schema({
     forest: {type: Boolean, default: false},
     level: {type: Number, default: 1},
     experience: {type: Number, default: 0},
+    init_carbon: {type: Number},
     strike: {type: [String], default: []},
     xstrike: {type: [String], default: []}
 });

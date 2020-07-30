@@ -36,12 +36,7 @@ class TypePlantController {
 			} else {
 				// Bad
 				state = 'B';
-            }
-            
-            const userPlant = {
-                actualPlant,
-                urlPicture: `${picture}${type}t${lvl}${state}.png`
-            }
+			}
 			return res.status(200).json({ actualPlant, url: `${picture}${type}t${lvl}${state}.png` });
 		} catch (error) {
 			console.error(error);
@@ -94,12 +89,14 @@ class TypePlantController {
 		const userForest = await User.findById(idUser).populate('forest');
 		userForest.forest.forEach(element => {
 			forestPlant.push(element.type);
-        });
+		});
 
-        const alreadyHavePlant = await Plant.findOne({user: idUser, forest: false})
-        if (alreadyHavePlant) {
-            return res.status('200').json({message: `Ya posees una planta activa en estos momentos, cuidala y has que crezca`})
-        }
+		const alreadyHavePlant = await Plant.findOne({ user: idUser, forest: false });
+		if (alreadyHavePlant) {
+			return res
+				.status('200')
+				.json({ message: `Ya posees una planta activa en estos momentos, cuidala y has que crezca` });
+		}
 
 		// Get random type not owned by the user
 		const plantsNotOwned = await TypePlant.find({ _id: { $nin: forestPlant } });
@@ -128,7 +125,7 @@ class TypePlantController {
 	//                              PUTS CONTROLLERS
 	//-----------------------------------------------------------------------//
 
-    // Move plant lvl 3 with Good health to the forest
+	// Move plant lvl 3 with Good health to the forest
 	async movePlantToForest(req, res) {
 		const { plantId } = req.params;
 		const { forest } = req.body;
@@ -138,9 +135,9 @@ class TypePlantController {
 
 		if (forest) {
 			if (plant.level < 3 || !plant.health) {
-				return res
-					.status(200)
-					.json({ message: `${plant.name} debe tener al menos nivel 3 para plantarla y estar sana, su nivel actual es ${plant.level}` });
+				return res.status(200).json({
+					message: `${plant.name} debe tener al menos nivel 3 para plantarla y estar sana, su nivel actual es ${plant.level}`,
+				});
 			}
 			await Plant.findByIdAndUpdate({ _id: plantId }, { forest: true });
 			await User.findByIdAndUpdate({ _id: userId }, { $push: { forest: plant } });
@@ -148,10 +145,17 @@ class TypePlantController {
 		} else {
 			return res.status(200).json({ message: `Aun te falta mejorar el ambiente para plantar a ${plant.name}` });
 		}
+	}
+
+	// Check level plant
+	async checkCarbonPlants() {
+        // Obtengo todas las plantas que estan en uso actualmente
+        const activesPlants = await Plant.find({forest: false})
+        activesPlants.forEach( plant => {
+            let idUserOwner = plant.user
+        });
+
     }
-
-    // Check level plant
-
 }
 
 module.exports = TypePlantController;
