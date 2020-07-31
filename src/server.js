@@ -1,12 +1,12 @@
 const { config } = require('./config/config.js');
 const express = require('express');
 var cors = require('cors');
-
 const { setIntervalAsync } = require('set-interval-async/dynamic');
+
 const PlantController = require('./controllers/plant.controller');
 const plantController = new PlantController
 
-// Check if Trimester has ended
+// Check every X time plants states
 setIntervalAsync(plantController.checkCarbonPlants, 36000000);
 
 // Initilization

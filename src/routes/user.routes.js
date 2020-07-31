@@ -14,6 +14,9 @@ router.get('/users', userController.getUsers);
 // GET specific user
 router.get('/users/:email', userController.getUser);
 
+// GET user medals
+router.get('/users/:email/medals', userController.userMedals)
+
 // POST create user
 router.post('/create/users', userController.createUser);
 
@@ -22,7 +25,5 @@ router.put('/update/users/:username', userController.updateUser);
 
 // DETELE user
 // router.delete('/delete/users/:id', userController.funcion);
-
-
 
 module.exports = router;
