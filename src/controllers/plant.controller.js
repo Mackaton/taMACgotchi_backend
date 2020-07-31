@@ -157,13 +157,15 @@ class TypePlantController {
 	}
 
 	// Check level plant
-	async checkCarbonPlants(req,res) {
-        // Obtengo todas las plantas que estan en uso actualmente
+	async checkCarbonPlants() {
+
+        console.log('ejecuntando')
+
+        // Get all actives plants (every plant which arent in forest)
         const activesPlants = await Plant.find({forest: false}).populate('user')
+
         // Updated every active plant
         activesPlants.forEach( async plant => {
-            // let idUserOwner = plant.user
-            // let user = User.findById({_id: idUserOwner})
             let user = plant.user
             const lastMark = user.carbon.length
             let userCarbon = user.carbon[lastMark-1];
@@ -178,7 +180,7 @@ class TypePlantController {
                     const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $inc: {experience: 1}})
                     if (plantUpdated.experience > 6 && plantUpdated.experience < 14) {
                         await Plant.findByIdAndUpdate({_id: plant._id}, {level: 2})
-                    } else if (plantUpdated.experience > 13)  {
+                    } else if (plantUpdated.experience > 13 && plantUpdated.experience < 21)  {
                         await Plant.findByIdAndUpdate({_id: plant._id}, {level: 3})
                     } else if (plantUpdated.experience > 20) {
                         // no more request to db
@@ -200,7 +202,6 @@ class TypePlantController {
                 }
             }
         });
-        res.send('pipi')
     }
 }
 

@@ -83,6 +83,17 @@ class UserController {
 		}
 	}
 
+	// all users
+	async userMedals(req, res) {
+		const { email } = req.params
+		try {
+			const userMedals = await User.findOne({email: email}, 'medals');
+			res.status(200).send(userMedals.medals);
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
 	/* ================================ POSTS =============================== */
 
 	// create new user

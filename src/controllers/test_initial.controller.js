@@ -53,13 +53,13 @@ class TestInitialController {
 			// Validacion
 			const validation = await TestInitial.find({user: user});
 			if (validation.length > 0) return res.status(400).json({ error: `El usuario ${username} ya completo el test inicial` });
-			
+
 			// Carbon Prom
 			var promCarbon = 0;
 			results.forEach(result => {
 				promCarbon += result.value;
 			});
-			
+
 			// Tasks prom
 			const tasks = await Task.find();
 			var tasks_challenges = [];
