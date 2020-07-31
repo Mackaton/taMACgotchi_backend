@@ -128,14 +128,15 @@ class UserController {
 			const task = await Task.findById(id_task);
 			//const challenge = await Challenge.findOne({category: task.category, tier: user.})
 
-			let new_task_challenge = user.task_challenges;
-			new_task_challenge.forEach(async task_challenge => {
+			var new_task_challenge = user.task_challenges;
+			var new_task = [];
+			new_task_challenge.forEach(async (task_challenge) => {
 				if (task_challenge.task.equals(id_task)){
 					var tier = 1;
 					if (task_challenge.tier !== 0) tier = task_challenge.tier;
 					else task_challenge.tier = 1;
 					const actual_tier = await Challenge.findOne({category: task.category, tier: tier});
-					if (task_challenge.day === 0) task_challenge.date = new Date();
+					if (task_challenge.days === 0) task_challenge.date = new Date();
 					if (task_challenge.days + 1 !== actual_tier.duration){
 						task_challenge.days += 1;
 						task_challenge.checkday = check;
@@ -150,10 +151,13 @@ class UserController {
 							task_challenge.status = false;
 						}
 					}
+					new_task.push(task_challenge);
+				} else{
+					new_task.push(task_challenge);
 				}
 			});
-
-			await User.findByIdAndUpdate(user._id, {task_challenges: new_task_challenge});
+			
+			await User.findByIdAndUpdate(user._id, {task_challenges: new_task});
 			res.send('ok');
 		} catch (error){
 			console.error(error);
@@ -169,14 +173,16 @@ class UserController {
 				let task_challenges = user.task_challenges;
 				var carbon = 0;
 				var achievement_carbon = 0;
+				var new_task = [];
 				
-				task_challenges.forEach( async task_challenge => {
+				task_challenges.forEach( async (task_challenge) => {
 
 					const task = await Task.findById(task_challenge.task);
 
 					if (task_challenge.checkday){
 						task_challenge.checkday = null;
 						task_challenge.prom = (task_challenge.prom * 29/30) + 1/30;
+						console.log(task_challenge.task);
 						carbon += task.value * task_challenge.prom;
 					} else if (task_challenge.checkday === false){
 						task_challenge.checkday = null;
@@ -188,14 +194,14 @@ class UserController {
 							task_challenge.date = new Date();
 						}
 					}
+					new_task.push(task_challenge);
 				});
 
 				user.challenges_completed.forEach(challenge =>{
 					achievement_carbon += challenge.value;
 				});
 				carbon += 7 + achievement_carbon;
-
-				await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: carbon, date: new Date()}}, task_challenges: task_challenges})
+				await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: carbon, date: new Date()}}, task_challenges: new_task})
 			});
 		}catch(error){
 			console.error(error);

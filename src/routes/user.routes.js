@@ -21,6 +21,8 @@ router.post('/create/users', userController.createUser);
 router.put('/update/users/:username', userController.updateUser);
 router.put('/update/users/tasks/:username', userController.updateUserTask);
 
+router.put('/update/carbon', userController.updateCarbon);
+
 // DETELE user
 // router.delete('/delete/users/:id', userController.funcion);
 
