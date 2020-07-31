@@ -1,5 +1,6 @@
 const TestInitial = require('../models/test_initial.model');
-const User = require('../models/user.model')
+const User = require('../models/user.model');
+const Task = require('../models/task.model');
 
 class TestInitialController {
 
@@ -59,9 +60,20 @@ class TestInitialController {
 				promCarbon += result.value;
 			});
 			
+			// Tasks prom
+			const tasks = await Task.find();
+			var tasks_challenges = [];
+			tasks.forEach( task => {
+				var promTest = 0
+				if (task.index === results.find(result => result.id_question.equals(task.question).index)){
+					promTest = 1;
+				}
+				tasks_challenges.push({task: task._id, prom: promTest})
+			});
+
 			// User update
 			//user.carbon.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0)); 
-			await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: promCarbon + 7, date: new Date()}}})
+			await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: promCarbon + 7, date: new Date()}}, task_challenges: tasks_challenges})
 
             const test = new TestInitial({ user: user._id, date: new Date(), results: results, prom_carbon: promCarbon});
 			await test.save(function (err) {

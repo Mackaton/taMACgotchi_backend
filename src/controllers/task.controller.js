@@ -1,5 +1,6 @@
 const Task = require('../models/task.model');
-//const challenges = require('../filldb/insert_challenges');
+const User = require('../models/user.model');
+//const tasks = require('../filldb/insert_tasks');
 
 class TaskController {
 
@@ -9,7 +10,7 @@ class TaskController {
 	async getTaskById(req, res) {
 		try {
             const id_task_req = req.params.id;
-			const task = await Task.find({ _id: id_task_req, challenge: false });
+			const task = await Task.findById(id_task_req);
 			res.send(task);
 		} catch (error) {
 			console.log(error);
@@ -26,33 +27,30 @@ class TaskController {
 		}
 	}
 
-	// Get challenge by id
-	async getChallengeById(req, res) {
+	async getTasksByUsername(req, res) {
 		try {
-            const id_task_req = req.params.id;
-            const task = await Task.find({ _id: id_task_req, challenge: true });
-			res.send(task);
+            const username = req.params.username;
+			const user = await User.findOne({username: username});
+
+			var inactive = [];
+
+			// Search tasks inactives by user
+			user.task_challenges.forEach(task => {
+				if (task.status === false || task.checkday) inactive.push(task.task);
+			});
+
+            const tasks = await Task.find({ _id: {$nin : inactive} });
+			res.send(tasks)
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
-	//Get all challenges
-	async getChallenges(req, res) {
-		try {
-			const tasks = await Task.find({ challenge: true });
-			res.send(tasks);
-		} catch (error) {
-			console.log(error);
-		}
-	}
-
-	/*async insertChallenges(req, res){
+	/*async insertTasks(){
 		try{
-			await challenges.forEach(challenge => {
-				challenge['challenge'] = true;
-				var new_challenge = new Task(challenge);
-				new_challenge.save(function (err){if (err) return console.error(err)})
+			await tasks.forEach(task => {
+				var new_task = new Task(task);
+				new_task.save(function (err){if (err) return console.error(err)})
 			});
 		}catch(error){
 			console.log(error);
@@ -61,7 +59,7 @@ class TaskController {
 
 	/* ================================ PUTS ================================ */
 
-	async updateTaskOrChallenge(req, res) {
+	async updateTask(req, res) {
 		try {
             const id_task_req = req.params.id;
             const task_req = req.body;
@@ -76,24 +74,11 @@ class TaskController {
 
 	async postTask(req, res) {
 		try {
-			const { name, tier, value } = req.body;
-			const task = new Task({ name, challenge: false, tier, value });
+			const { category, description, question, value } = req.body;
+			const task = new Task({ category, description, question, value });
 			await task.save(function (err) {
                 if (err) return res.status(400).json({ error: 'Ha ocurrido un error' });
-                res.status(200).json({ message: `Task ${name} creada correctamente` });
-			});
-		} catch (error) {
-			console.log(error);
-		}
-	}
-
-	async postChallenge(req, res) {
-		try {
-			const { name, tier, value } = req.body;
-			const task = new Task({ name, challenge: true, tier, value });
-			await task.save(function (err) {
-                if (err) return res.status(400).json({ error: 'Ha ocurrido un error' });
-                res.status(200).json({ message: `Challenge ${name} creada correctamente` });
+                res.status(200).json({ message: `Task ${description} creada correctamente` });
 			});
 		} catch (error) {
 			console.log(error);
@@ -102,11 +87,11 @@ class TaskController {
 
 	/* ================================ DELETE ================================ */
 
-	async deleteTC(req, res) {
+	async deleteTask(req, res) {
 		try{
-			const id_tc = req.params.id
-			await Task.findByIdAndDelete(id_tc);
-			res.status(200).json({ message: 'Task/Challenge eliminado correctamente'})
+			const id_task = req.params.id
+			await Task.findByIdAndDelete(id_task);
+			res.status(200).json({ message: 'Task eliminado correctamente'})
 		} catch (error){
 			console.log(error)
 		}

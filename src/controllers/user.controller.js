@@ -1,6 +1,8 @@
 const User = require('../models/user.model');
 const Plant = require('../models/plant.model');
 const TestInitial = require('../models/test_initial.model');
+const Task = require('../models/task.model');
+const Challenge = require('../models/challenge.model');
 
 const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud/';
 
@@ -112,6 +114,90 @@ class UserController {
 			console.log(user);
 			res.send('ok');
 		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	// update user tasks info
+	async updateUserTask(req,res){
+		const username = req.params.username;
+		const { id_task, check } = req.body;
+		const query = { username: username }
+		try{
+			const user = await User.findOne(query);
+			const task = await Task.findById(id_task);
+			//const challenge = await Challenge.findOne({category: task.category, tier: user.})
+
+			let new_task_challenge = user.task_challenges;
+			new_task_challenge.forEach(async task_challenge => {
+				if (task_challenge.task.equals(id_task)){
+					var tier = 1;
+					if (task_challenge.tier !== 0) tier = task_challenge.tier;
+					else task_challenge.tier = 1;
+					const actual_tier = await Challenge.findOne({category: task.category, tier: tier});
+					if (task_challenge.day === 0) task_challenge.date = new Date();
+					if (task_challenge.days + 1 !== actual_tier.duration){
+						task_challenge.days += 1;
+						task_challenge.checkday = check;
+					}else{		
+						await User.findByIdAndUpdate(user._id, {$push: {challenges_completed: actual_tier._id}})
+						const new_tier = await Challenge.find({category: task.category, tier: tier + 1});
+						if (new_tier.length > 0) {
+							task_challenge.days += 1;
+							task_challenge.tier += 1;
+							task_challenge.checkday = check;
+						} else{
+							task_challenge.status = false;
+						}
+					}
+				}
+			});
+
+			await User.findByIdAndUpdate(user._id, {task_challenges: new_task_challenge});
+			res.send('ok');
+		} catch (error){
+			console.error(error);
+		}
+	}
+
+	async updateCarbon(){
+		try{
+			const users = await User.find().populate('challenges_completed');
+
+			users.forEach( async user => {
+				
+				let task_challenges = user.task_challenges;
+				var carbon = 0;
+				var achievement_carbon = 0;
+				
+				task_challenges.forEach( async task_challenge => {
+
+					const task = await Task.findById(task_challenge.task);
+
+					if (task_challenge.checkday){
+						task_challenge.checkday = null;
+						task_challenge.prom = (task_challenge.prom * 29/30) + 1/30;
+						carbon += task.value * task_challenge.prom;
+					} else if (task_challenge.checkday === false){
+						task_challenge.checkday = null;
+						task_challenge.prom = task_challenge.prom * 29/30;
+						carbon += task.value * task_challenge.prom;
+					} else{
+						if (task_challenge.days !== 0) {
+							task_challenge.days = 0;
+							task_challenge.date = new Date();
+						}
+					}
+				});
+
+				user.challenges_completed.forEach(challenge =>{
+					achievement_carbon += challenge.value;
+				});
+				carbon += 7 + achievement_carbon;
+
+				await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: carbon, date: new Date()}}, task_challenges: task_challenges})
+			});
+		}catch(error){
 			console.error(error);
 		}
 	}
