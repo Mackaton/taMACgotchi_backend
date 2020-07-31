@@ -37,7 +37,7 @@ class UserController {
 			}
 
 			// Response User values (please we need to change the user schema model to add init test boolean )
-			const user = {
+			let user = {
 				_id: userData._id,
 				username: userData.username,
 				email: userData.email,
@@ -50,7 +50,9 @@ class UserController {
 				task_challenges: userData.task_challenges,
 				friends: userData.friends,
 				medals: userData.medals,
-				forest: userData.forest
+				forest: userData.forest,
+				actualPlant: {},
+				urlPicture: 'not plant available'
 			};
 
 			// Get actual active plant from the user
@@ -69,13 +71,10 @@ class UserController {
 					// Bad
 					state = 'B';
 				}
-				const userPlant = {
-					user,
-					actualPlant,
-					urlPicture: `${picture}${type}${lvl}${state}.png`,
-					InitTest: test,
-				};
-				return res.status(200).send(userPlant);
+				const urlImage = `${picture}${type}${lvl}${state}.png`
+				user.actualPlant = actualPlant
+				user.urlPicture = urlImage
+				return res.status(200).send(user);
 			}
 		} catch (error) {
 			console.log(error);
