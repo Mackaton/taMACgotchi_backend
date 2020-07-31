@@ -170,7 +170,7 @@ class TypePlantController {
 
             // Check if the user carbon is better than plant carbon
             if (userCarbon.value < plant.init_carbon || userCarbon.value < 2.0) {
-                // If the plant are sick (health: false) then heal it
+                // If the plant is sick (health: false) then heal it
                 if (!plant.health) {
                     await Plant.findByIdAndUpdate({_id: plant._id}, {health: true})
                 } else {
@@ -185,9 +185,18 @@ class TypePlantController {
                     }
                 }
             } else {
-                const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {strike: 'x'}})
-                if (plantUpdated.strike.length == 3) {
-                    await Plant.findByIdAndUpdate({_id: plant._id}, {health: false})
+                // If the plant isnt sick, then increase STRIKE sickness and sick it
+                if (plant.health) {
+                    const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {strike: 'x'}})
+                    if (plantUpdated.strike.length >= 2) {
+                        await Plant.findByIdAndUpdate({_id: plant._id}, {health: false, strike: []})
+                    }
+                // If the plant is sick, then increaste DEATH XSTRIKE
+                } else {
+                    const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {xstrike: 'x'}})
+                    if (plantUpdated.xstrike.length >= 2) {
+                        await Plant.findByIdAndDelete({_id: plant._id})
+                    }
                 }
             }
         });

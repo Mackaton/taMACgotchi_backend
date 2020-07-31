@@ -27,6 +27,7 @@ router
     // PUT update actual plant to forest
     .put('/update/plant/:plantId', plantController.movePlantToForest)
 
+router.get('/tumbaribm', plantController.checkCarbonPlants)
 
 
 
