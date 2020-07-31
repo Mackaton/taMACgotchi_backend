@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "DEBUG=app:* nodemon src/index",
+    "tunnel:dev": "npx ngrok http 3000",
     "start": "NODE_ENV=production node src/index",
     "test": "mocha tests/ --exit",
     "pretest": "npx eslint --ignore-path .gitignore . --fix"
@@ -28,12 +29,13 @@
     "testing",
     "base"
   ],
-  "author": "jesus kauze",
-  "license": "ISC",
+  "author": "Jesús Kauze, David Segura, Amin Arriaga, Manuel Escalante",
+  "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "ibm-watson": "^5.6.1",
     "mongoose": "^5.9.26",
     "set-interval-async": "1.0.33"
   },
@@ -43,6 +45,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "mocha": "^8.0.1",
+    "ngrok": "^3.2.7",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5"
   }

@@ -22,4 +22,7 @@ app.use(require('./routes/medal.routes'));
 app.use(require('./routes/test_initial.routes'));
 app.use(require('./routes/question.routes'));
 
+// Watson
+app.use(require('./routes/watson.routes'));
+
 module.exports = app;
