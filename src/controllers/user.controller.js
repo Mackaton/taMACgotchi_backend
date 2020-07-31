@@ -140,35 +140,43 @@ class UserController {
 			//const challenge = await Challenge.findOne({category: task.category, tier: user.})
 
 			var new_task_challenge = user.task_challenges;
-			var new_task = [];
-			new_task_challenge.forEach(async (task_challenge) => {
-				if (task_challenge.task.equals(id_task)){
-					var tier = 1;
-					if (task_challenge.tier !== 0) tier = task_challenge.tier;
-					else task_challenge.tier = 1;
-					const actual_tier = await Challenge.findOne({category: task.category, tier: tier});
-					if (task_challenge.days === 0) task_challenge.date = new Date();
-					if (task_challenge.days + 1 !== actual_tier.duration){
+			var task_challenge = null;
+			var index_task = 0;
+
+			console.log(new_task_challenge);
+
+			new_task_challenge.forEach((task_c, index) =>{
+				if (task_c.task.equals(id_task)) {
+					task_challenge = task_c;
+					index_task = index;
+				} 
+			})
+
+			if (task_challenge !== null) {
+				var tier = 1;
+				if (task_challenge.tier !== 0) tier = task_challenge.tier;
+				else task_challenge.tier = 1;
+				const actual_tier = await Challenge.findOne({category: task.category, tier: tier});
+				if (task_challenge.days === 0) task_challenge.date = new Date();
+				if (task_challenge.days + 1 !== actual_tier.duration){
+					task_challenge.days += 1;
+					task_challenge.checkday = check;
+				}else{		
+					await User.findByIdAndUpdate(user._id, {$push: {challenges_completed: actual_tier._id}})
+					const new_tier = await Challenge.find({category: task.category, tier: tier + 1});
+					if (new_tier.length > 0) {
 						task_challenge.days += 1;
+						task_challenge.tier += 1;
 						task_challenge.checkday = check;
-					}else{		
-						await User.findByIdAndUpdate(user._id, {$push: {challenges_completed: actual_tier._id}})
-						const new_tier = await Challenge.find({category: task.category, tier: tier + 1});
-						if (new_tier.length > 0) {
-							task_challenge.days += 1;
-							task_challenge.tier += 1;
-							task_challenge.checkday = check;
-						} else{
-							task_challenge.status = false;
-						}
+					} else{
+						task_challenge.status = false;
 					}
-					new_task.push(task_challenge);
-				} else{
-					new_task.push(task_challenge);
 				}
-			});
+			}
+
+			new_task_challenge[index_task] = task_challenge;
 			
-			await User.findByIdAndUpdate(user._id, {task_challenges: new_task});
+			await User.findByIdAndUpdate(user._id, {task_challenges: new_task_challenge});
 			res.send('ok');
 		} catch (error){
 			console.error(error);
@@ -186,14 +194,14 @@ class UserController {
 				var achievement_carbon = 0;
 				var new_task = [];
 				
-				task_challenges.forEach( async (task_challenge) => {
+				
+				for (const task_challenge of task_challenges){
 
 					const task = await Task.findById(task_challenge.task);
 
 					if (task_challenge.checkday){
 						task_challenge.checkday = null;
 						task_challenge.prom = (task_challenge.prom * 29/30) + 1/30;
-						console.log(task_challenge.task);
 						carbon += task.value * task_challenge.prom;
 					} else if (task_challenge.checkday === false){
 						task_challenge.checkday = null;
@@ -206,7 +214,7 @@ class UserController {
 						}
 					}
 					new_task.push(task_challenge);
-				});
+				}
 
 				user.challenges_completed.forEach(challenge =>{
 					achievement_carbon += challenge.value;
