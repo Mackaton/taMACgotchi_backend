@@ -20,7 +20,7 @@ class TaskController {
 	// Get all tasks
 	async getTasks(req, res) {
 		try {
-			const tasks = await Task.find({ challenge: false });
+			const tasks = await Task.find();
 			res.send(tasks);
 		} catch (error) {
 			console.log(error);
