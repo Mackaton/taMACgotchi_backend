@@ -9,6 +9,7 @@ var TestInitialSchema = Schema({
     results:
     [{
         id_question: {type: mongoose.Schema.Types.ObjectId, ref: 'Question'},
+        index: Number,
         value: Number
     }],
     user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},

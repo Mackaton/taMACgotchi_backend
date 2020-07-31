@@ -22,6 +22,7 @@ router.post('/create/users', userController.createUser);
 
 // PUT update user
 router.put('/update/users/:username', userController.updateUser);
+router.put('/update/users/tasks/:username', userController.updateUserTask);
 
 // DETELE user
 // router.delete('/delete/users/:id', userController.funcion);

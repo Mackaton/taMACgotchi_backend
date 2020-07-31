@@ -21,9 +21,14 @@ var UserSchema = Schema({
     task_challenges:
     [{
         task: {type: mongoose.Schema.Types.ObjectId, ref: 'Task'},
-        prom: Number,
-        date: Date
+        tier: {type: Number, default: 0},
+        status: {type: Boolean, default: true},
+        checkday : {type: Boolean, default: null},
+        days: {type: Number, default: 0},
+        prom: {type: Number, default: 0},
+        date: {type: Date, default: null}
     }],
+    challenges_completed: [{type: mongoose.Schema.Types.ObjectId, ref: 'Challenge'}],
     forest: [{type: mongoose.Schema.Types.ObjectId, ref: 'Plant'}],
     picture: String
 });

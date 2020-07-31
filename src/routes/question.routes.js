@@ -14,6 +14,8 @@ router.get('/questions', questionsController.getQuestions);
 // POST
 router.post('/create/questions', questionsController.postQuestion);
 
+//router.post('/insert/questions', questionsController.insertQuestion);
+
 // DELETE
 router.delete('/delete/questions/:id', questionsController.deleteQuestion);
 
