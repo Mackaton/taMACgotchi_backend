@@ -21,4 +21,6 @@ router.post('/create/medals', medalController.postMedal)
 // DELETE
 router.delete('/delete/medals/:id', medalController.deleteMedal);
 
+//router.post('/insert/medals', medalController.insertMedals)
+
 module.exports = router;

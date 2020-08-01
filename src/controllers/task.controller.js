@@ -36,7 +36,7 @@ class TaskController {
 
 			// Search tasks inactives by user
 			user.task_challenges.forEach(task => {
-				if (task.status === false || task.checkday) inactive.push(task.task);
+				if (task.status === false || task.checkday || task.checkday === false) inactive.push(task.task);
 			});
 
             const tasks = await Task.find({ _id: {$nin : inactive} });
@@ -63,8 +63,8 @@ class TaskController {
 		try {
             const id_task_req = req.params.id;
             const task_req = req.body;
-            const task = await Task.findByIdAndUpdate(id_task_req, task_req);
-            res.send(task)
+            await Task.findByIdAndUpdate(id_task_req, task_req);
+            res.status(200).json({message: 'Ok'});
 		} catch (error) {
 			console.log(error);
 		}

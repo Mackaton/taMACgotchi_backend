@@ -36,8 +36,8 @@ class TestInitialController {
             const id_req = await User.findOne({username: username});
             const id = id_req._id;
             const test_req = req.body;
-            const test = await TestInitial.findOneAndUpdate({user: id}, test_req );
-            res.send(test);
+            await TestInitial.findOneAndUpdate({user: id}, test_req );
+            res.status(200).json({message: 'Ok'});
 		} catch (error) {
 			console.log(error);
 		}

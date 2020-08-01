@@ -3,6 +3,7 @@ const Plant = require('../models/plant.model');
 const TestInitial = require('../models/test_initial.model');
 const Task = require('../models/task.model');
 const Challenge = require('../models/challenge.model');
+const Medal = require('../models/medals.model');
 
 const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud/';
 
@@ -38,6 +39,13 @@ class UserController {
 				test = false
 			}
 
+			// taskDone
+			let inactive = [];
+
+			userData.task_challenges.forEach(task => {
+				if (task.status === false || task.checkday || task.checkday === false) inactive.push(task.task);
+			});
+
 			// Response User values (please we need to change the user schema model to add init test boolean )
 			let user = {
 				_id: userData._id,
@@ -54,7 +62,8 @@ class UserController {
 				medals: userData.medals,
 				forest: userData.forest,
 				actualPlant: {},
-				urlPicture: 'not plant available'
+				urlPicture: 'not plant available',
+				taskDone: inactive.length,
 			};
 
 			// Get actual active plant from the user
@@ -123,7 +132,7 @@ class UserController {
 				res.status(200).json({ message: `Usuario ${username} actualizado exitosamente` });
 			});
 			console.log(user);
-			res.send('ok');
+			res.status(200).json({message: 'Ok'});
 		} catch (error) {
 			console.error(error);
 		}
@@ -139,11 +148,9 @@ class UserController {
 			const task = await Task.findById(id_task);
 			//const challenge = await Challenge.findOne({category: task.category, tier: user.})
 
-			var new_task_challenge = user.task_challenges;
-			var task_challenge = null;
-			var index_task = 0;
-
-			console.log(new_task_challenge);
+			let new_task_challenge = user.task_challenges;
+			let task_challenge = null;
+			let index_task = 0;
 
 			new_task_challenge.forEach((task_c, index) =>{
 				if (task_c.task.equals(id_task)) {
@@ -153,7 +160,7 @@ class UserController {
 			})
 
 			if (task_challenge !== null) {
-				var tier = 1;
+				let tier = 1;
 				if (task_challenge.tier !== 0) tier = task_challenge.tier;
 				else task_challenge.tier = 1;
 				const actual_tier = await Challenge.findOne({category: task.category, tier: tier});
@@ -161,8 +168,11 @@ class UserController {
 				if (task_challenge.days + 1 !== actual_tier.duration){
 					task_challenge.days += 1;
 					task_challenge.checkday = check;
-				}else{		
-					await User.findByIdAndUpdate(user._id, {$push: {challenges_completed: actual_tier._id}})
+				}else{
+					const medal = await Medal.find({challenge: actual_tier._id});
+					let query = {$push: {challenges_completed: actual_tier._id}};
+					if (medal.length > 0) query = {$push: [{challenges_completed: actual_tier._id}, {medals: medal[0]._id}]};
+					await User.findByIdAndUpdate(user._id, query)
 					const new_tier = await Challenge.find({category: task.category, tier: tier + 1});
 					if (new_tier.length > 0) {
 						task_challenge.days += 1;
@@ -177,7 +187,7 @@ class UserController {
 			new_task_challenge[index_task] = task_challenge;
 			
 			await User.findByIdAndUpdate(user._id, {task_challenges: new_task_challenge});
-			res.send('ok');
+			res.status(200).json({message: 'Ok'});
 		} catch (error){
 			console.error(error);
 		}
@@ -190,9 +200,9 @@ class UserController {
 			users.forEach( async user => {
 				
 				let task_challenges = user.task_challenges;
-				var carbon = 0;
-				var achievement_carbon = 0;
-				var new_task = [];
+				let carbon = 0;
+				let achievement_carbon = 0;
+				let new_task = [];
 				
 				
 				for (const task_challenge of task_challenges){
@@ -216,9 +226,6 @@ class UserController {
 					new_task.push(task_challenge);
 				}
 
-				user.challenges_completed.forEach(challenge =>{
-					achievement_carbon += challenge.value;
-				});
 				carbon += 7 + achievement_carbon;
 				await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: carbon, date: new Date()}}, task_challenges: new_task})
 			});
