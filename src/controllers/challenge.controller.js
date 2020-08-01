@@ -21,16 +21,15 @@ class ChallengeController {
 	async getChallengeByUsername(req, res) {
 		try {
             const username = req.params.username;
-			const user = await User.findOne({username: username});
+			const user = await User.findOne({username: username}).populate('task_challenges.task');
 
 			var active = [];
 
 			// Search tasks inactives by user
-			
 			for (const task of user.task_challenges){
 				if (task.tier !== 0 && task.status){
-                    const challenge = await Challenge.findOne({category: task.category, tier: task.tier});
-                    active.push(challenge._id);
+					const challenge = await Challenge.findOne({category: task.task.category, tier: task.tier});
+					active.push(challenge._id);
                 }
 			}
 
