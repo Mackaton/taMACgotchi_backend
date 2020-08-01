@@ -1,14 +1,20 @@
-class WatsonController {
-  /* ================================ POSTS ================================ */
+// Dialogs
+const bienvenida = require('../watson/wellcome');
+const despedida = require('../watson/goodbye');
+const estadoDesafios = require('../watson/challenge_status');
 
-  async postWebhook(req, res) {
-    try {
-      console.log('pene', req, res);
-      res.status(200).send({ message: 'done' });
-    } catch (error) {
-      console.log(error);
-    }
-  }
+class WatsonController {
+	async postWebhook(req, res) {
+		console.log(req.body);
+
+		try {
+			bienvenida(req, res);
+			despedida(req, res);
+			estadoDesafios(req, res);
+		} catch (error) {
+			console.log(error);
+		}
+	}
 }
 
 module.exports = WatsonController;
