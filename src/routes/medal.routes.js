@@ -11,12 +11,13 @@ const medalController = new MedalController
 // GET
 router.get('/medals', medalController.getMedals);
 router.get('/medals/:id', medalController.getMedalsById);
+router.get('/medals/user/:username', medalController.getMedalsByUsername);
 
 // UPDATE
-router.put('/update/medals/:id', medalController.updateMedal)
+router.put('/update/medals/:id', medalController.updateMedal);
 
 // POST
-router.post('/create/medals', medalController.postMedal)
+router.post('/create/medals', medalController.postMedal);
 
 // DELETE
 router.delete('/delete/medals/:id', medalController.deleteMedal);

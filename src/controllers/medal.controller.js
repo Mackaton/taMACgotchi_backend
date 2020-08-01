@@ -1,5 +1,6 @@
 const Medals = require('../models/medals.model');
 const Task = require('../models/task.model');
+const User = require('../models/user.model');
 //const medals = require('../filldb/insert_medals');
 
 class MedalsController {
@@ -12,6 +13,26 @@ class MedalsController {
             const id_medals_req = req.params.id;
 			const medals = await Medals.findById(id_medals_req).populate('challenge');
 			res.send(medals)
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	async getMedalsByUsername(req, res) {
+		try {
+            const username = req.params.username;
+			const user = await User.findOne({username: username});
+
+			var medals = [];
+
+			// Search medals by user
+			
+			for (const medal of user.medals){
+                medals.push(medal);
+			}
+
+            const medals_user = await Medals.find({ _id: medals});
+			res.send(medals_user)
 		} catch (error) {
 			console.log(error);
 		}
