@@ -2,7 +2,7 @@ const Challenge = require('../models/challenge.model');
 const User = require('../models/user.model');
 
 // ------------------------------------------------------------------------------------------------
-// node: Despedida.
+// node: Estado desafio.
 // ------------------------------------------------------------------------------------------------
 
 // Intent name.
@@ -34,10 +34,6 @@ async function handler(req, res) {
 		}
 
 		const challenges = await Challenge.find({ _id: active });
-
-		// for (let i = 0; i < challenges.length; i++) {
-		// challengesActive += `${challenges[i].category}: ${challenges[i].description}\n\n`;
-		// }
 
 		challenges.forEach(data => {
 			challengesActive += `${data.category}: ${data.description}\n\n`;
