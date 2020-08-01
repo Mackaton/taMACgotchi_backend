@@ -171,7 +171,7 @@ class UserController {
 				}else{
 					const medal = await Medal.find({challenge: actual_tier._id});
 					let query = {$push: {challenges_completed: actual_tier._id}};
-					if (medal.length > 0) query = {$push: [{challenges_completed: actual_tier._id}, {medals: medal[0]._id}]};
+					if (medal.length > 0) query = {$push: {challenges_completed: actual_tier._id, medals: medal[0]._id}};
 					await User.findByIdAndUpdate(user._id, query)
 					const new_tier = await Challenge.find({category: task.category, tier: tier + 1});
 					if (new_tier.length > 0) {
