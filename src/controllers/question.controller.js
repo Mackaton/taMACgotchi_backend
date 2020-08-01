@@ -1,4 +1,5 @@
 const Questions = require('../models/question.model');
+//const all_questions = require('../filldb/insert_question')
 
 class QuestionsController {
 
@@ -6,7 +7,6 @@ class QuestionsController {
 
 	// Get all questions
 	async getQuestions(req, res) {
-		console.log('algo')
 		try {
 			const questions = await Questions.find();
 			res.send(questions);
@@ -42,6 +42,13 @@ class QuestionsController {
 			console.log(error)
 		}
 	}
+
+	/*async insertQuestion (){
+		await all_questions.forEach( (item) => {
+			item.save(function (err){if (err) return console.error(err)})
+		})
+		console.log('Querys Insertados')
+	}*/
 }
 
 module.exports = QuestionsController;

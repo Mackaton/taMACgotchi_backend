@@ -1,6 +1,9 @@
 const User = require('../models/user.model');
 const Plant = require('../models/plant.model');
 const TestInitial = require('../models/test_initial.model');
+const Task = require('../models/task.model');
+const Challenge = require('../models/challenge.model');
+const Medal = require('../models/medals.model');
 
 const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud/';
 
@@ -36,6 +39,13 @@ class UserController {
 				test = false
 			}
 
+			// taskDone
+			let inactive = [];
+
+			userData.task_challenges.forEach(task => {
+				if (task.status === false || task.checkday || task.checkday === false) inactive.push(task.task);
+			});
+
 			// Response User values (please we need to change the user schema model to add init test boolean )
 			let user = {
 				_id: userData._id,
@@ -52,7 +62,8 @@ class UserController {
 				medals: userData.medals,
 				forest: userData.forest,
 				actualPlant: {},
-				urlPicture: 'not plant available'
+				urlPicture: 'not plant available',
+				taskDone: inactive.length,
 			};
 
 			// Get actual active plant from the user
@@ -76,6 +87,17 @@ class UserController {
 				user.urlPicture = urlImage
 				return res.status(200).send(user);
 			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	// all users
+	async userMedals(req, res) {
+		const { email } = req.params
+		try {
+			const userMedals = await User.findOne({email: email}, 'medals');
+			res.status(200).send(userMedals.medals);
 		} catch (error) {
 			console.log(error);
 		}
@@ -110,8 +132,104 @@ class UserController {
 				res.status(200).json({ message: `Usuario ${username} actualizado exitosamente` });
 			});
 			console.log(user);
-			res.send('ok');
+			res.status(200).json({message: 'Ok'});
 		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	// update user tasks info
+	async updateUserTask(req,res){
+		const username = req.params.username;
+		const { id_task, check } = req.body;
+		const query = { username: username }
+		try{
+			const user = await User.findOne(query);
+			const task = await Task.findById(id_task);
+			//const challenge = await Challenge.findOne({category: task.category, tier: user.})
+
+			let new_task_challenge = user.task_challenges;
+			let task_challenge = null;
+			let index_task = 0;
+
+			new_task_challenge.forEach((task_c, index) =>{
+				if (task_c.task.equals(id_task)) {
+					task_challenge = task_c;
+					index_task = index;
+				} 
+			})
+
+			if (task_challenge !== null) {
+				let tier = 1;
+				if (task_challenge.tier !== 0) tier = task_challenge.tier;
+				else task_challenge.tier = 1;
+				const actual_tier = await Challenge.findOne({category: task.category, tier: tier});
+				if (task_challenge.days === 0) task_challenge.date = new Date();
+				if (task_challenge.days + 1 !== actual_tier.duration){
+					task_challenge.days += 1;
+					task_challenge.checkday = check;
+				}else{
+					const medal = await Medal.find({challenge: actual_tier._id});
+					let query = {$push: {challenges_completed: actual_tier._id}};
+					if (medal.length > 0) query = {$push: [{challenges_completed: actual_tier._id}, {medals: medal[0]._id}]};
+					await User.findByIdAndUpdate(user._id, query)
+					const new_tier = await Challenge.find({category: task.category, tier: tier + 1});
+					if (new_tier.length > 0) {
+						task_challenge.days += 1;
+						task_challenge.tier += 1;
+						task_challenge.checkday = check;
+					} else{
+						task_challenge.status = false;
+					}
+				}
+			}
+
+			new_task_challenge[index_task] = task_challenge;
+			
+			await User.findByIdAndUpdate(user._id, {task_challenges: new_task_challenge});
+			res.status(200).json({message: 'Ok'});
+		} catch (error){
+			console.error(error);
+		}
+	}
+
+	async updateCarbon(){
+		try{
+			const users = await User.find().populate('challenges_completed');
+
+			users.forEach( async user => {
+				
+				let task_challenges = user.task_challenges;
+				let carbon = 0;
+				let achievement_carbon = 0;
+				let new_task = [];
+				
+				
+				for (const task_challenge of task_challenges){
+
+					const task = await Task.findById(task_challenge.task);
+
+					if (task_challenge.checkday){
+						task_challenge.checkday = null;
+						task_challenge.prom = (task_challenge.prom * 29/30) + 1/30;
+						carbon += task.value * task_challenge.prom;
+					} else if (task_challenge.checkday === false){
+						task_challenge.checkday = null;
+						task_challenge.prom = task_challenge.prom * 29/30;
+						carbon += task.value * task_challenge.prom;
+					} else{
+						if (task_challenge.days !== 0) {
+							task_challenge.days = 0;
+							task_challenge.date = new Date();
+						}
+					}
+					new_task.push(task_challenge);
+				}
+
+				carbon += 7 + achievement_carbon;
+				await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: carbon, date: new Date()}}, task_challenges: new_task})
+			});
+		}catch(error){
 			console.error(error);
 		}
 	}
