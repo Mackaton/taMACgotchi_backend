@@ -3,7 +3,7 @@ const Task = require('../models/task.model');
 const User = require('../models/user.model');
 //const medals = require('../filldb/insert_medals');
 
-const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud/';
+const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud';
 class MedalsController {
 
 	/* ================================ GETS ================================ */
