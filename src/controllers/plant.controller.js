@@ -157,20 +157,22 @@ class TypePlantController {
 	}
 
 	// Check level plant
-	async checkCarbonPlants(req,res) {
-        // Obtengo todas las plantas que estan en uso actualmente
+	async checkCarbonPlants() {
+
+        console.log('ejecuntando')
+
+        // Get all actives plants (every plant which arent in forest)
         const activesPlants = await Plant.find({forest: false}).populate('user')
+
         // Updated every active plant
         activesPlants.forEach( async plant => {
-            // let idUserOwner = plant.user
-            // let user = User.findById({_id: idUserOwner})
             let user = plant.user
             const lastMark = user.carbon.length
             let userCarbon = user.carbon[lastMark-1];
 
             // Check if the user carbon is better than plant carbon
             if (userCarbon.value < plant.init_carbon || userCarbon.value < 2.0) {
-                // If the plant are sick (health: false) then heal it
+                // If the plant is sick (health: false) then heal it
                 if (!plant.health) {
                     await Plant.findByIdAndUpdate({_id: plant._id}, {health: true})
                 } else {
@@ -178,20 +180,28 @@ class TypePlantController {
                     const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $inc: {experience: 1}})
                     if (plantUpdated.experience > 6 && plantUpdated.experience < 14) {
                         await Plant.findByIdAndUpdate({_id: plant._id}, {level: 2})
-                    } else if (plantUpdated.experience > 13)  {
+                    } else if (plantUpdated.experience > 13 && plantUpdated.experience < 21)  {
                         await Plant.findByIdAndUpdate({_id: plant._id}, {level: 3})
                     } else if (plantUpdated.experience > 20) {
                         // no more request to db
                     }
                 }
             } else {
-                const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {strike: 'x'}})
-                if (plantUpdated.strike.length == 3) {
-                    await Plant.findByIdAndUpdate({_id: plant._id}, {health: false})
+                // If the plant isnt sick, then increase STRIKE sickness and sick it
+                if (plant.health) {
+                    const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {strike: 'x'}})
+                    if (plantUpdated.strike.length >= 2) {
+                        await Plant.findByIdAndUpdate({_id: plant._id}, {health: false, strike: []})
+                    }
+                // If the plant is sick, then increaste DEATH XSTRIKE
+                } else {
+                    const plantUpdated = await Plant.findByIdAndUpdate({_id: plant._id}, { $push: {xstrike: 'x'}})
+                    if (plantUpdated.xstrike.length >= 2) {
+                        await Plant.findByIdAndDelete({_id: plant._id})
+                    }
                 }
             }
         });
-        res.send('pipi')
     }
 }
 

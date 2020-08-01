@@ -1,5 +1,6 @@
 const TestInitial = require('../models/test_initial.model');
-const User = require('../models/user.model')
+const User = require('../models/user.model');
+const Task = require('../models/task.model');
 
 class TestInitialController {
 
@@ -35,8 +36,8 @@ class TestInitialController {
             const id_req = await User.findOne({username: username});
             const id = id_req._id;
             const test_req = req.body;
-            const test = await TestInitial.findOneAndUpdate({user: id}, test_req );
-            res.send(test);
+            await TestInitial.findOneAndUpdate({user: id}, test_req );
+            res.status(200).json({message: 'Ok'});
 		} catch (error) {
 			console.log(error);
 		}
@@ -52,16 +53,27 @@ class TestInitialController {
 			// Validacion
 			const validation = await TestInitial.find({user: user});
 			if (validation.length > 0) return res.status(400).json({ error: `El usuario ${username} ya completo el test inicial` });
-			
+
 			// Carbon Prom
 			var promCarbon = 0;
 			results.forEach(result => {
 				promCarbon += result.value;
 			});
-			
+
+			// Tasks prom
+			const tasks = await Task.find();
+			var tasks_challenges = [];
+			tasks.forEach( task => {
+				var promTest = 0
+				if (task.index === results.find(result => task.question.equals(result.id_question)).index){
+					promTest = 1;
+				}
+				tasks_challenges.push({task: task._id, prom: promTest})
+			});
+
 			// User update
 			//user.carbon.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0)); 
-			await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: promCarbon + 7, date: new Date()}}})
+			await User.findByIdAndUpdate(user._id, {$push: {carbon: {value: promCarbon + 7, date: new Date()}}, task_challenges: tasks_challenges})
 
             const test = new TestInitial({ user: user._id, date: new Date(), results: results, prom_carbon: promCarbon});
 			await test.save(function (err) {
