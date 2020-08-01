@@ -1,5 +1,6 @@
 const Medals = require('../models/medals.model');
 const Task = require('../models/task.model');
+//const medals = require('../filldb/insert_medals');
 
 class MedalsController {
 
@@ -26,6 +27,17 @@ class MedalsController {
 		}
 	}
 
+	/*async insertMedals(){
+		try{
+			await medals.forEach(medal => {
+				var new_medal = new Medals(medal);
+				new_medal.save(function (err){if (err) return console.error(err)})
+			});
+		}catch(error){
+			console.log(error);
+		}
+	}*/
+	
 	/* ================================ PUTS ================================ */
 
 	async updateMedal(req, res) {

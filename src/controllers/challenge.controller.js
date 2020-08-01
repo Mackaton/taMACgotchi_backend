@@ -26,12 +26,13 @@ class ChallengeController {
 			var active = [];
 
 			// Search tasks inactives by user
-			user.task_challenges.forEach(async task => {
+			
+			for (const task of user.task_challenges){
 				if (task.tier !== 0 && task.status){
                     const challenge = await Challenge.findOne({category: task.category, tier: task.tier});
                     active.push(challenge._id);
                 }
-			});
+			}
 
             const challenges = await Challenge.find({ _id: active });
 			res.send(challenges)
