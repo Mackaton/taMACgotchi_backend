@@ -3,6 +3,7 @@ const Task = require('../models/task.model');
 const User = require('../models/user.model');
 //const medals = require('../filldb/insert_medals');
 
+const picture = 'https://storagepictures-cos-standard-37s.s3.us-south.cloud-object-storage.appdomain.cloud/';
 class MedalsController {
 
 	/* ================================ GETS ================================ */
@@ -31,8 +32,13 @@ class MedalsController {
                 medals.push(medal);
 			}
 
-            const medals_user = await Medals.find({ _id: medals});
-			res.send(medals_user)
+			const medals_user = await Medals.find({ _id: medals});
+			
+			let new_json = [];
+			for (const medal of medals_user){
+                new_json.push({name: medal.name, pictureurl: `${picture}/${medal.name}.png`});
+			}
+			res.send(new_json);
 		} catch (error) {
 			console.log(error);
 		}
